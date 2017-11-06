@@ -1,0 +1,21 @@
+<% var item, key %>
+
+<% htmlWebpackPlugin.options.links = htmlWebpackPlugin.options.links || [] %>
+<% htmlWebpackPlugin.options.scripts = htmlWebpackPlugin.options.scripts || [] %>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <% for (item of htmlWebpackPlugin.options.links) { %>
+    <link rel="stylesheet" href="<%= item %>">
+    <% } %>
+  </head>
+  <body>
+    <div id="react-content"></div>
+    <% for (item of htmlWebpackPlugin.options.scripts) { %>
+    <script src="<%= item %>" type="text/javascript" charset="utf-8"></script>
+    <% } %>
+  </body>
+</html>
