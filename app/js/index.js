@@ -4,9 +4,10 @@ import { createStore, applyMiddleware } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { createLogger } from 'redux-logger';
 import RootReducer from 'core/reducers'
-import style from '../css/style.css'
+import '../css/style.css'
 import App from 'core/components/App';
 import 'antd/dist/antd.css'
+import '../css/antd.css'
 
 const logger = createLogger()
 const createStoreMiddleware = applyMiddleware(

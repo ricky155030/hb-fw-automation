@@ -2,6 +2,7 @@ import React from 'react'
 import style from './Form.css'
 import axios from 'axios'
 import { Form, Icon, Input, Button, Upload } from 'antd'
+import ImgurModal from './ImgurModal'
 
 class TicketForm extends React.PureComponent {
   constructor (props) {
@@ -69,6 +70,8 @@ class TicketForm extends React.PureComponent {
           Create a Ticket
         </h2>
         <hr className={style.hr} />
+        <ImgurModal url="https://i.imgur.com/BhljIAJ.jpg" />
+        <ImgurModal url="https://i.imgur.com/ph73tKv.jpg" />
         <Form>
           <Form.Item
             label="User"
