@@ -1,7 +1,14 @@
 import React from 'react'
 import style from './Form.css'
 import axios from 'axios'
+import { fill, take } from 'lodash'
 import { Form, Icon, Input, Button, Upload } from 'antd'
+import Select from './Select'
+
+const options = fill(new Array(100), 1).map((i, index) => ({
+  value: index,
+  label: `aa_${index}`
+}))
 
 class TicketForm extends React.PureComponent {
   constructor (props) {
@@ -69,6 +76,11 @@ class TicketForm extends React.PureComponent {
           Create a Ticket
         </h2>
         <hr className={style.hr} />
+        <Select
+          mode="multiple"
+          options={options}
+          style={{ width: '100%' }}
+        />
         <Form>
           <Form.Item
             label="User"
