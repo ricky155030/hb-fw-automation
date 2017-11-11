@@ -1,6 +1,7 @@
 import React from 'react'
 import style from './Form.css'
 import axios from 'axios'
+import { fill, take } from 'lodash'
 import { Form, Icon, Input, Button, Upload } from 'antd'
 import ImgurModal from './ImgurModal'
 
