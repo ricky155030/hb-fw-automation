@@ -1,45 +1,170 @@
 import React from 'react'
-import { Select as AntdSelect } from 'antd'
+import { escapeRegExp, remove, isEmpty, chain, keyBy, sortBy } from 'lodash'
+import { Select as AntdSelect, Icon } from 'antd'
+import style from './Select.css'
+
+const SELECT_ALL = 'Select All'
 
 class Select extends React.PureComponent {
   constructor(props) {
     super(props)
 
-    this.counter = 0
     this.state = {
-      input: ''
+      input: '',
+      options: []
     }
   }
 
   handleSearch = input => {
-    this.counter = 0
-    this.setState({ input })
+    const options = this.calculateOption(input)
+    this.setState({ input, options })
+  }
+
+  handleSelect = (selected, option) => {
+    const {
+      options
+    } = this.state
+
+    const {
+      value
+    } = this.props
+
+    let nextValue = []
+
+    if(this.getOptionText(option) == SELECT_ALL) {
+      nextValue = [
+        ...value,
+        ...options.filter(o => value.indexOf(o.value.toString()) == -1).map(o => o.value.toString())
+      ]
+    } else {
+      nextValue = [
+        ...value,
+        selected
+      ]
+    }
+
+    this.props.onSelect(nextValue)
+  }
+
+  handleDeselect = selected => {
+    const {
+      value
+    } = this.props
+
+    const nextValue = value.filter(i => i !== selected)
+
+    this.props.onSelect(nextValue)
+  }
+
+  getOptionText = option => {
+    if(typeof(option.props.children) !== 'string') {
+      return option.props.children.props.text
+    } 
+
+    return option.props.children
+  }
+
+  handleChange = value => {
+    // Trigger clear event
+    if(isEmpty(value) && typeof(value) !== 'string') {
+      this.props.onSelect(value)
+    }
+  }
+
+  calculateOption(input) {
+    const {
+      value,
+      options,
+      filterFunc
+    } = this.props
+
+    const optionsKeyByValue = keyBy(options, 'value')
+    const regExp = this.generateRegExp(input)
+
+    const filteredOption = chain(options)
+      .filter(o => !input || input && filterFunc(input, o.label, regExp))
+      .filter(o => value.indexOf(o.value.toString()) == -1)
+      .take(100)
+      .value()
+    
+    const selectedOption = chain(value)
+      .map(v => optionsKeyByValue[v])
+      .value()
+
+    const result = [
+      ...selectedOption,
+      ...filteredOption
+    ]
+
+    return sortBy(result, 'value')
+  }
+
+  generateChildren = () => {
+    const {
+      mode,
+      value
+    } = this.props
+
+    let options = []
+
+    if(this.state.options.length != 0 && mode == 'multiple') {
+      options.push(
+        <AntdSelect.Option key={SELECT_ALL} style={{ background: 'red', color: 'white'}}>
+          <div text={SELECT_ALL}>
+            <Icon className={style.optionIcon} type="plus-square" />
+            <b style={{ background: 'red' }}>{ SELECT_ALL }</b>
+          </div>
+        </AntdSelect.Option>
+      )
+    }
+
+    const children = this.state.options.map(o => (
+      <AntdSelect.Option key={o.value}>
+        { o.label }
+      </AntdSelect.Option>
+    ))
+
+    return options.concat(children)
+  }
+
+  handleFilterOption = (input, option) => {
+    const {
+      filterFunc
+    } = this.props
+
+    let target = this.getOptionText(option)
+    const regExp = this.generateRegExp(input)
+
+    return filterFunc(input, target, regExp) || target == SELECT_ALL
+  }
+
+  generateRegExp = input => {
+    let regExp = /^$/
+
+    try {
+      regExp = new RegExp(input, 'i')
+    } catch(e) {
+      console.log(e)
+    }
+
+    return regExp
   }
 
   render () {
     const {
-      options
+      filterFunc
     } = this.props
 
-    const {
-      input
-    } = this.state
-
-    console.log(options)
-    console.log(input)
     return (
-      <AntdSelect {...this.props} onSearch={this.handleSearch}>
-      {
-        options.map((o, index) => {
-          if(this.counter < 10 && o.label.toUpperCase().indexOf(input.toUpperCase()) != -1) {
-            this.counter++
-            console.log(o.label)
-            return <AntdSelect.Option key={o.value}>{ o.label }</AntdSelect.Option>
-          } else {
-            return <AntdSelect.Option key={o.value} style={{ display: 'none' }}>{ o.label }</AntdSelect.Option>
-          }
-        })
-      }
+      <AntdSelect 
+        {...this.props} 
+        onChange={this.handleChange}
+        onSearch={this.handleSearch}
+        onSelect={this.handleSelect}
+        onDeselect={this.handleDeselect}
+        filterOption={this.handleFilterOption}
+      >
+      { this.generateChildren() }
       </AntdSelect>
     )
   }

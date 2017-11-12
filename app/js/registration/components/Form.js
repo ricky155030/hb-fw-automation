@@ -3,13 +3,20 @@ import style from './Form.css'
 import axios from 'axios'
 import { fill, take } from 'lodash'
 import { Form, Icon, Input, Button, Upload } from 'antd'
-import ImgurModal from './ImgurModal'
+import Select from './Select'
+import Test from './Test'
+
+const options = fill(new Array(100000), 1).map((i, value) => ({
+  value,
+  label: `aa_${value}`
+}))
 
 class TicketForm extends React.PureComponent {
   constructor (props) {
     super()
     this.state = {
-      fileList: []
+      fileList: [],
+      value: []
     }
   }
 
@@ -61,6 +68,7 @@ class TicketForm extends React.PureComponent {
     } = this.props.form
 
     const {
+      value,
       fileList
     } = this.state
 
@@ -71,8 +79,17 @@ class TicketForm extends React.PureComponent {
           Create a Ticket
         </h2>
         <hr className={style.hr} />
-        <ImgurModal url="https://i.imgur.com/BhljIAJ.jpg" />
-        <ImgurModal url="https://i.imgur.com/ph73tKv.jpg" />
+        <Select 
+          allowClear
+          value={value}
+          mode="multiple"
+          options={options}
+          style={{ width: '100%' }}
+          onSelect={v => this.setState({ value: v })}
+          filterFunc={(input, option, regExp) => {
+            return option.match(regExp) !== null
+          }}
+        />
         <Form>
           <Form.Item
             label="User"
