@@ -26,24 +26,27 @@ class Select extends React.PureComponent {
     } = this.state
 
     const {
+      mode,
       value
     } = this.props
 
-    let nextValue = []
+    let optionText = this.getOptionText(option)
 
-    if(this.getOptionText(option) == SELECT_ALL) {
-      nextValue = [
-        ...value,
-        ...options.filter(o => value.indexOf(o.value.toString()) == -1).map(o => o.value.toString())
-      ]
-    } else {
-      nextValue = [
-        ...value,
-        selected
-      ]
+    if(!mode) {
+      this.props.onSelect(selected)
     }
 
-    this.props.onSelect(nextValue)
+    if(mode == 'multiple' && optionText == SELECT_ALL) {
+      this.props.onSelect([
+        ...value,
+        ...options.filter(o => value.indexOf(o.value.toString()) == -1).map(o => o.value.toString())
+      ])
+    } else {
+      this.props.onSelect([
+        ...value,
+        selected
+      ])
+    }
   }
 
   handleDeselect = selected => {
@@ -51,9 +54,13 @@ class Select extends React.PureComponent {
       value
     } = this.props
 
-    const nextValue = value.filter(i => i !== selected)
+    if(!mode) {
+      this.props.onSelect(null)
+    }
 
-    this.props.onSelect(nextValue)
+    if(mode == 'multiple') {
+      this.props.onSelect(value.filter(i => i !== selected))
+    }
   }
 
   getOptionText = option => {
@@ -152,8 +159,13 @@ class Select extends React.PureComponent {
 
   render () {
     const {
+      mode,
       filterFunc
     } = this.props
+
+    if(mode && mode != 'multiple') {
+      return <span style={{ color: 'red' }}>Error: Select is not support for { mode }</span>
+    }
 
     return (
       <AntdSelect 

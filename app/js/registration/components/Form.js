@@ -81,8 +81,8 @@ class TicketForm extends React.PureComponent {
         <hr className={style.hr} />
         <Select 
           allowClear
+          showSearch
           value={value}
-          mode="multiple"
           options={options}
           style={{ width: '100%' }}
           onSelect={v => this.setState({ value: v })}
